@@ -1,6 +1,6 @@
 ---
 title: "Lab5"
-author: "Your Name"
+author: "Can Zhang"
 date: "2024-10-03"
 output: "github_document"
 ---
@@ -15,7 +15,7 @@ library(bruceR)
 library(dplyr)
 library(labelled)
 
-lab5 <- read.csv("C:/Users/Colin/Documents/GitHub/Website/Lab5/lab5data.csv")
+lab5 <- read.csv("C:/Users/User/Documents/GitHub/Lab5/lab5data.csv")
 
 ```
 
@@ -74,7 +74,7 @@ emm<- emmeans(model, "Group")
 
 emm
 
-contrast(emm, list("Greek Women vs. Greek Men" = c(1, 1, 0, 0)))
+contrast(emm, list("Greek Women vs. Greek Men" = c(-1, 1, 0, 0)))
 
 contrast(emm, list("Greek Main Effect" = c(1, 1, -1, -1)))
 
@@ -129,17 +129,33 @@ ggplot(plot2, aes(x = Group, y = Drinks, fill = Group)) +
 # Q1: You hypothesized that Greek Women have a lower GPA than non-Greek women. Conduct the correct analysis below and explain whether or not your hypothesis is supported. 
 ```{r}
 
+model <- lm(GPA ~ Group, data = lab5)
 
+emm<- emmeans(model, "Group")
+
+emm
+
+contrast(emm, list("Greek Women vs. Non-Greek Women" = c(-1, 0, 1, 0)))
 
 ```
+The hypothesis is not supported, since the difference between the GPA of Greek women and non-Greek women is not significant (p = .38).
 
 # Q2: You hypothesized that on average women have a higher GPA than men. Conduct the correct analysis below and explain whether or not your hypothesis is supported. 
 ```{r}
 
+mod<-MANOVA(lab5, dv = "GPA", between = c("Gender", "Greek")) 
+EMMEANS(mod, effect = "Gender", by = "Greek", p.adjust = "none")
 
 ```
-
+The hypothesis is not supported, since the difference between the GPA of men and women is generally not significant (p = .73).
 # Q3: Create a bar graph to compare GPA by gender and greek (either graph works)
 ```{r}
+
+lab5_clean <- lab5 %>% drop_na(GPA)
+
+plot1<-summarySE(lab5_clean, measurevar="GPA", groupvars=c("Group"))
+
+ggplot(plot1, aes(x = Group, y = GPA, fill = Group)) +
+  geom_col()  + theme_bruce() + theme(axis.text.x = element_text(angle = -10))
 
 ```
